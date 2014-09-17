@@ -20,7 +20,7 @@
 <div id="wrapper">
     <div id="page-wrapper">
         <div class="container">
-            <h3>Collection : collection_Id</h3>
+            <h3>Collection : <%=map%></h3>
             <table class='table'>
                 <tr>
                     <th>Property</th>
