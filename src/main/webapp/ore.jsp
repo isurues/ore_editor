@@ -16,6 +16,14 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/bootbox.min.js"></script>
+
+<table align="center">
+    <tr>
+        <td><img src="images/sead_logo_a.png"></td>
+        <td><img src="images/sead_logo_b.png"></td>
+    </tr>
+</table>
+
 <%
     OREResource resource = (OREResource) request.getAttribute("ore_resource");
 %>

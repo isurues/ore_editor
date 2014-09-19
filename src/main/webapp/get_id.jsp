@@ -14,11 +14,17 @@
 <script src="js/bootstrap.js"></script>
 <script src="js/bootbox.min.js"></script>
 
+<table align="center">
+    <tr>
+        <td><img src="images/sead_logo_a.png"></td>
+        <td><img src="images/sead_logo_b.png"></td>
+    </tr>
+</table>
+
 <div id="wrapper">
     <div id="page-wrapper">
         <div class="container">
             <h3>SEAD Collection Details</h3>
-
             <form role='form' action="read_ore" method="post">
                 <div class='form-group'>
                     <label for='id'>Collection ID</label>
