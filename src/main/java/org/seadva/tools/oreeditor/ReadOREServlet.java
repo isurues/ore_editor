@@ -20,18 +20,22 @@ public class ReadOREServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             // get collection id
-            String id = request.getParameter("id");
-            log.info("ID Accepted: " + id);
+            String collectionURI = request.getParameter("id");
+            String collectionId = collectionURI.substring(collectionURI.lastIndexOf('/') + 1);
+            log.info("ID Accepted: " + collectionURI);
             // read ORE from registry REST API
-            String orePath = OREUtils.readORE(id);
+            String orePath = OREUtils.readORE(collectionURI, collectionId);
 
             InputStream input = new FileInputStream(orePath);
             OREParser parser = OREParserFactory.getInstance("RDF/XML");
             ResourceMap resourceMap = parser.parse(input);
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/ore.jsp");
-            // set resource map details
-            request.setAttribute("resource_map", parseORE(resourceMap));
+            // set OREResource as a request attribute
+            request.setAttribute("ore_resource", parseORE(resourceMap));
+            // set ResourceMap to session
+            request.getSession().setAttribute("resource_map", resourceMap);
+            request.getSession().setAttribute("coll_id", collectionId);
             dispatcher.forward(request, response);
         } catch (Exception e) {
             log.error("Error while forwarding response", e);
@@ -92,8 +96,11 @@ public class ReadOREServlet extends HttpServlet {
                 // read predicates
                 List<Triple> metadataTriples = aggregatedResource.listTriples();
 
-                for(Triple metadataTriple: metadataTriples){
-                    if(metadataTriple.isLiteral()) {
+                for (Triple metadataTriple: metadataTriples) {
+                    if (metadataTriple.getPredicate() == null) {
+                        continue;
+                    }
+                    if (metadataTriple.isLiteral()) {
                         String predicateUri = metadataTriple.getPredicate().getURI().toString();
                         String value = metadataTriple.getObjectLiteral();
                         childResource.addPredicate(predicateUri, value);

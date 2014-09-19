@@ -1,5 +1,6 @@
 <%@ page import="org.seadva.tools.oreeditor.OREResource" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.util.List" %>
 <%@page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 
 <!DOCTYPE html>
@@ -16,7 +17,7 @@
 <script src="js/bootstrap.js"></script>
 <script src="js/bootbox.min.js"></script>
 <%
-    OREResource resource = (OREResource) request.getAttribute("resource_map");
+    OREResource resource = (OREResource) request.getAttribute("ore_resource");
 %>
 
 <div id="wrapper">
@@ -26,21 +27,24 @@
                 String resourceURI = resource.getUri();
             %>
             <h3>Collection : <%=resourceURI%></h3>
-            <form role='form' action="#" method="post">
+            <form role='form' action="persist_ore" method="post">
                 <table class='table' style="width: 70%">
                     <tr>
                         <th>Property</th>
                         <th>Value</th>
                     </tr>
                     <%
-                        Map<String, String> properties = resource.getPredicates();
-                        for (Map.Entry<String, String> entry : properties.entrySet()) {
+                        Map<String, List<String>> properties = resource.getPredicates();
+                        for (Map.Entry<String, List<String>> entry : properties.entrySet()) {
+                            List<String> valueList = entry.getValue();
+                            for (int i = 0; i < valueList.size(); i++) {
                     %>
                     <tr><td style="width: 30%"><%=entry.getKey() %></td><td>
                         <input type='text' class='form-control' width="150"
-                               name="<%=entry.getKey() %>" value="<%= entry.getValue()%>">
+                               name="<%=resourceURI%>__<%=entry.getKey() %>" value="<%= valueList.get(i)%>">
                     </td></tr>
                     <%
+                            }
                         }
                     %>
                 </table>
@@ -56,14 +60,17 @@
                         <th>Value</th>
                     </tr>
                     <%
-                        Map<String, String> childProperties = child.getPredicates();
-                        for (Map.Entry<String, String> childEntry : childProperties.entrySet()) {
+                        Map<String, List<String>> childProperties = child.getPredicates();
+                        for (Map.Entry<String, List<String>> childEntry : childProperties.entrySet()) {
+                            List<String> valueList = childEntry.getValue();
+                            for (int i = 0; i < valueList.size(); i++) {
                     %>
                     <tr><td style="width: 30%"><%=childEntry.getKey() %></td><td>
                         <input type='text' class='form-control' width="150"
-                               name="<%=childEntry.getKey() %>" value="<%= childEntry.getValue()%>">
+                               name="<%=childUri%>__<%=childEntry.getKey() %>" value="<%= valueList.get(i)%>">
                     </td></tr>
                     <%
+                            }
                         }
                     %>
                 </table>

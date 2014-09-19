@@ -11,12 +11,23 @@
     </welcome-file-list>
 
     <servlet>
-        <servlet-name>readore</servlet-name>
+        <servlet-name>read</servlet-name>
         <servlet-class>org.seadva.tools.oreeditor.ReadOREServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>persist</servlet-name>
+        <servlet-class>org.seadva.tools.oreeditor.PersistOREServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
-        <servlet-name>readore</servlet-name>
+        <servlet-name>read</servlet-name>
         <url-pattern>/read_ore</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>persist</servlet-name>
+        <url-pattern>/persist_ore</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -53,23 +53,23 @@ public class OREUtils {
         }
     }
 
-    public static String readORE(String id) {
+    public static String readORE(String collectionURI, String collectionId) {
         String absolutePath = null;
         try {
             // read ORE by calling the registry REST API
             WebResource webResource =  Client.create().resource(OREUtils.RO_URL);
             ClientResponse roResponse = webResource.path("resource").path("ro")
-                    .path(URLEncoder.encode(id)).get(ClientResponse.class);
+                    .path(URLEncoder.encode(collectionURI)).get(ClientResponse.class);
 
             // write the ORE into a file
             String rand = UUID.randomUUID().toString();
-            String orePath = rand + "_oaiore.xml";
+            String orePath = rand + "_" + collectionId + "_in_oaiore.xml";
             IOUtils.copy(roResponse.getEntityInputStream(), new FileOutputStream(orePath));
 
             absolutePath = new java.io.File(orePath).getAbsolutePath();
             log.info("ORE Path: " + absolutePath);
         } catch (IOException e) {
-            log.error("Error while reading ORE: " + id, e);
+            log.error("Error while reading ORE: " + collectionURI, e);
         }
         return absolutePath;
     }
