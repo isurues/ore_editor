@@ -60,24 +60,10 @@ public class PersistOREServlet extends HttpServlet {
             // get all predicates
             Aggregation aggregation = resourceMap.getAggregation();
             List<Triple> triples = aggregation.listTriples();
-            for (Triple triple : triples) {
-                if (triple.getPredicate() == null) {
-                    continue;
-                }
-                if (triple.isLiteral()) {
-                    String predicateURI = triple.getPredicate().getURI().toString();
-                    String value = triple.getObjectLiteral().trim();
-                    String parameter = request.getParameter(resourceURI + "__" + predicateURI).trim();
-                    if (!value.equals(parameter)) {
-                        aggregation.removeTriple(triple);
-                        // update the predicate value with form value
-                        triple.relate(triple.getPredicate(), parameter);
-                        aggregation.addTriple(triple);
-                        isUpdated = true;
-                    }
-                }
-            }
+            // update triples according to request parameters
+            isUpdated = updateTriples(aggregation, resourceURI, triples, request);
 
+            // process aggregated resources
             List<AggregatedResource> aggregatedResources =
                     resourceMap.getAggregation().getAggregatedResources();
             for (AggregatedResource aggregatedResource : aggregatedResources) {
@@ -98,47 +84,55 @@ public class PersistOREServlet extends HttpServlet {
                 String childURI = aggregatedResource.getURI().toString();
                 // read predicates
                 List<Triple> metadataTriples = aggregatedResource.listTriples();
-                Map<String, Integer> arrayIndexes = new HashMap<String, Integer>();
-                // update all triples of resource
-                for(Triple metadataTriple: metadataTriples) {
-                    if (metadataTriple.getPredicate() == null) {
-                        continue;
-                    }
-                    if (metadataTriple.isLiteral()) {
-                        String predicateURI = metadataTriple.getPredicate().getURI().toString();
-                        String value = metadataTriple.getObjectLiteral().trim();
-                        String[] paramValues = request.getParameterValues(childURI + "__" + predicateURI);
-                        String parameter;
-                        if (paramValues.length == 0) {
-                            continue;
-                        } else if (paramValues.length == 1) {
-                            parameter = paramValues[0];
-                            if (!value.equals(parameter)) {
-                                aggregation.removeTriple(metadataTriple);
-                                // update the predicate value with form value
-                                metadataTriple.relate(metadataTriple.getPredicate(), parameter);
-                                aggregation.addTriple(metadataTriple);
-                                isUpdated = true;
-                            }
-                        } else {
-                            Integer index = arrayIndexes.get(predicateURI);
-                            if (index == null) {
-                                index = 0;
-                                arrayIndexes.put(predicateURI, index);
-                            }
-                            parameter = paramValues[index];
-                            arrayIndexes.put(predicateURI, index + 1);
-                            aggregation.removeTriple(metadataTriple);
-                            // update the predicate value with form value
-                            metadataTriple.relate(metadataTriple.getPredicate(), parameter);
-                            aggregation.addTriple(metadataTriple);
-                            isUpdated = true;
-                        }
-                    }
-                }
+                // update triples according to request parameters
+                isUpdated = updateTriples(aggregation, childURI, metadataTriples, request);
             }
         } catch (Exception e) {
             log.error("Error while reading ORE. " + e);
+        }
+        return isUpdated;
+    }
+
+    private boolean updateTriples(Aggregation aggregation, String resourceURI, List<Triple> triples,
+                                 HttpServletRequest request) throws OREException {
+        boolean isUpdated = false;
+        Map<String, Integer> arrayIndexes = new HashMap<String, Integer>();
+        // update all triples of resource
+        for(Triple metadataTriple: triples) {
+            if (metadataTriple.getPredicate() == null) {
+                continue;
+            }
+            if (metadataTriple.isLiteral()) {
+                String predicateURI = metadataTriple.getPredicate().getURI().toString();
+                String value = metadataTriple.getObjectLiteral().trim();
+                String[] paramValues = request.getParameterValues(resourceURI + "__" + predicateURI);
+                String parameter;
+                if (paramValues.length == 0) {
+                    continue;
+                } else if (paramValues.length == 1) {
+                    parameter = paramValues[0];
+                    if (!value.equals(parameter)) {
+                        aggregation.removeTriple(metadataTriple);
+                        // update the predicate value with form value
+                        metadataTriple.relate(metadataTriple.getPredicate(), parameter);
+                        aggregation.addTriple(metadataTriple);
+                        isUpdated = true;
+                    }
+                } else {
+                    Integer index = arrayIndexes.get(predicateURI);
+                    if (index == null) {
+                        index = 0;
+                        arrayIndexes.put(predicateURI, index);
+                    }
+                    parameter = paramValues[index];
+                    arrayIndexes.put(predicateURI, index + 1);
+                    aggregation.removeTriple(metadataTriple);
+                    // update the predicate value with form value
+                    metadataTriple.relate(metadataTriple.getPredicate(), parameter);
+                    aggregation.addTriple(metadataTriple);
+                    isUpdated = true;
+                }
+            }
         }
         return isUpdated;
     }

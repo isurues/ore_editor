@@ -21,7 +21,9 @@ import java.util.UUID;
 public class OREUtils {
 
     private static Log log = LogFactory.getLog(ReadOREServlet.class);
-    public static String RO_URL = "http://localhost:8080/ro/";
+    // TODO : Use a config file for this
+    // public static String RO_URL = "http://localhost:8080/ro/";
+    public static String RO_URL = "http://seadva.d2i.indiana.edu/ro/";
     public static Predicate METS_LOCATION;
 
     static {
