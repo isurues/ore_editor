@@ -18,6 +18,14 @@ public class ReadOREServlet extends HttpServlet {
     private static Log log = LogFactory.getLog(ReadOREServlet.class);
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        handleGetPost(request, response);
+    }
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        handleGetPost(request, response);
+    }
+
+    private void handleGetPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             // get collection id
             String collectionURI = request.getParameter("id");
@@ -40,7 +48,6 @@ public class ReadOREServlet extends HttpServlet {
         } catch (Exception e) {
             log.error("Error while forwarding response", e);
         }
-
     }
 
     private OREResource parseORE(ResourceMap resourceMap) {
