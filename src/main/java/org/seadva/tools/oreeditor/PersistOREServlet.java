@@ -40,10 +40,14 @@ public class PersistOREServlet extends HttpServlet {
             log.info("Updated ORE written to: " + outAbsolutePath);
 
             // persist modified ORE through Registry API only if updated
+            int status;
             if (isUpdated) {
-                OREUtils.persistORE(outAbsolutePath);
+                status = OREUtils.persistORE(outAbsolutePath);
+            } else {
+                status = OREUtils.ORE_NO_UPDATE;
             }
-
+            // set status in session
+            request.getSession().setAttribute("status", status);
             // forward the user to get_id UI
             RequestDispatcher dispatcher = request.getRequestDispatcher("/get_id.jsp");
             dispatcher.forward(request, response);

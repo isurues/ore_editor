@@ -26,6 +26,10 @@ public class OREUtils {
     public static String RO_URL = "http://seadva.d2i.indiana.edu/ro/";
     public static Predicate METS_LOCATION;
 
+    public static int ORE_SUCCESS = 0;
+    public static int ORE_FAILURE = 1;
+    public static int ORE_NO_UPDATE = 2;
+
     static {
         try {
             METS_LOCATION = new Predicate();
@@ -38,7 +42,7 @@ public class OREUtils {
         }
     }
 
-    public static void persistORE(String orePath) {
+    public static int persistORE(String orePath) {
         WebResource webResource = Client.create().resource(RO_URL);
         java.io.File file = new java.io.File(orePath);
         FileDataBodyPart fdp = new FileDataBodyPart("file", file,
@@ -52,7 +56,9 @@ public class OREUtils {
                 .post(ClientResponse.class, formDataMultiPart);
         if (response.getStatus() != 200) {
             log.error("Bad Response on ORE persist..");
+            return ORE_FAILURE;
         }
+        return ORE_SUCCESS;
     }
 
     public static String readORE(String collectionURI, String collectionId) {
